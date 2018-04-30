@@ -1,9 +1,7 @@
-self.addEventListener("install", e => {
-  e.waitUntil(onInstall(e));
-});
-
-const CACHE = "cache--v1";
+const CACHE = "cache--v2";
 const MAP_CACHE = "map-cache--v1";
+
+self.addEventListener("install", e => e.waitUntil(onInstall(e)));
 
 async function onInstall() {
   self.skipWaiting();
@@ -25,19 +23,14 @@ async function onFetch(e) {
   try {
     const { request } = e;
     const url = new URL(request.url);
-
-    if (url.host === "api.tiles.mapbox.com") {
-      const cache = await caches.open(MAP_CACHE);
-      const matching = await cache.match(request);
-      if (matching) {
-        return matching;
-      } else {
-        const response = await fetch(request);
-        e.waitUntil(cache.put(request, response.clone()));
-        return response;
-      }
-    } else {
-      return fetch(request);
+    const cacheName = url.host === "api.tiles.mapbox.com" ? MAP_CACHE : CACHE;
+    const cache = await caches.open(cacheName);
+    const matching = await cache.match(request);
+    if (matching) return matching;
+    else {
+      const response = await fetch(request);
+      e.waitUntil(cache.put(request, response.clone()));
+      return response;
     }
   } catch (e) {
     // HACK: respond with promise that never resolves to trick Leaflet
