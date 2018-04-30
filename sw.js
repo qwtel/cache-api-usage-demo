@@ -1,4 +1,4 @@
-const CACHE = "cache--v2";
+const CACHE = "cache--v3";
 const MAP_CACHE = "map-cache--v1";
 
 self.addEventListener("install", e => e.waitUntil(onInstall(e)));
@@ -9,7 +9,7 @@ async function onInstall() {
   const cache = await caches.open(CACHE);
 
   return cache.addAll([
-    "/",
+    "./",
     "https://unpkg.com/leaflet@1.3.1/dist/leaflet.css",
     "https://unpkg.com/leaflet@1.3.1/dist/leaflet.js",
   ]);
