@@ -28,8 +28,8 @@ async function onFetch(e) {
     const matching = await cache.match(request);
     if (matching) return matching;
     else {
-      const response = await fetch(request);
-      e.waitUntil(cache.put(request, response.clone()));
+      const response = await fetch(request, { mode: 'cors', credentials: 'omit' });
+      if (response.status < 400) e.waitUntil(cache.put(request, response.clone()));
       return response;
     }
   } catch (e) {
